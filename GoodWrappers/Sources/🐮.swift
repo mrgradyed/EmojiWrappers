@@ -5,7 +5,7 @@ import Foundation
 
 @propertyWrapper
 public struct 🐮<Value> {
-    public var wrapper: Reference<Value>
+    private var wrapper: Reference<Value>
 
     public init(wrappedValue: Value) {
         wrapper = Reference(wrappedValue)
@@ -29,7 +29,7 @@ public struct 🐮<Value> {
     }
 }
 
-public final class Reference<Value> { // wrapping class
+private final class Reference<Value> { // wrapping class
     var value: Value
 
     init(_ val: Value) {
