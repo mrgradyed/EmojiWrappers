@@ -1,6 +1,8 @@
-# EmojiWrappers
-
+# EmojiWrappers 
 A funny collection of handy Swift wrappers
+
+<img width="396" src="https://github.com/mrgradyed/EmojiWrappers/assets/2436636/c87bad99-4397-4814-ade4-a7f74a2b2a4c">
+
 
 ## 🐮
 
