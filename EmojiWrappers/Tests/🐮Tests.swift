@@ -4,70 +4,74 @@ import Foundation
 import XCTest
 
 class 🐮Tests: XCTestCase {
-    struct TestStruct: Equatable, Codable {
-        var propA: String = "123"
-        var propB: Int = 456
-    }
-
     func testNotWrappedRead() {
+        struct NotWrapped: Equatable {
+            var propC: TestStruct
+        }
+
+        let a = NotWrapped(propC: TestStruct(propA: "k", propB: 97))
+        let b = a
+
         DispatchQueue.main.async {
-            struct NotWrapped: Equatable {
-                var propC: TestStruct = .init()
-            }
-
-            var a = NotWrapped()
-            var b = a
-
-            XCTAssertFalse(withUnsafePointer(to: &a.propC) { $0 } == withUnsafePointer(to: &b.propC) { $0 })
+            XCTAssertTrue(address(of: a.propC) != address(of: b.propC))
         }
     }
 
     func testWrappedRead() {
+        struct Wrapped: Equatable {
+            @🐮 var propC: TestStruct
+        }
+
+        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
+        let b = a
+
         DispatchQueue.main.async {
-            struct Wrapped: Equatable {
-                @🐮 var propC: TestStruct = .init()
-            }
-
-            let a = Wrapped()
-            let b = a
-
-            XCTAssertTrue(withUnsafePointer(to: a.propC) { $0 } == withUnsafePointer(to: b.propC) { $0 })
+            XCTAssertTrue(address(of: a.propC) == address(of: b.propC))
         }
     }
 
-    func testWrappedWrite() {
+    func testWrappedWriteSingleRef() {
+        struct Wrapped: Equatable {
+            @🐮 var propC: TestStruct
+        }
+
+        var a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
+        a.propC = TestStruct(propA: "changed", propB: 57)
+
+        XCTAssertTrue(a.propC == TestStruct(propA: "changed", propB: 57))
+    }
+
+    func testWrappedWriteMultiRef() {
+        struct Wrapped: Equatable {
+            @🐮 var propC: TestStruct
+        }
+
+        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
+        var b = a
+        b.propC = TestStruct(propA: "changed", propB: 57)
+
         DispatchQueue.main.async {
-            struct Wrapped: Equatable {
-                @🐮 var propC: TestStruct = .init()
-            }
-
-            let a = Wrapped()
-            var b = a
-
-            b.propC = .init()
-
-            XCTAssertFalse(withUnsafePointer(to: a.propC) { $0 } == withUnsafePointer(to: b.propC) { $0 })
+            XCTAssertTrue(address(of: a.propC) != address(of: b.propC))
         }
     }
 
     func testWrappedEquality() {
         struct Wrapped: Equatable {
-            @🐮 var propC: TestStruct = .init()
+            @🐮 var propC: TestStruct
         }
 
-        let a = Wrapped()
+        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
         var b = a
 
         XCTAssertTrue(a == b)
+        b.propC = TestStruct(propA: "k", propB: 97)
 
-        b.propC = .init()
-
-        XCTAssertFalse(a != b)
+        XCTAssertTrue(a == b)
     }
 
     func testWrappedDecodable() {
         struct Wrapped: Equatable, Decodable {
-            @🐮 var propC: TestStruct = .init()
+            @🐮 var propC: TestStruct
         }
 
         let json = "{\"propC\":{\"propA\":\"propA\",\"propB\":100}}"
@@ -78,7 +82,7 @@ class 🐮Tests: XCTestCase {
 
     func testWrappedEncodable() {
         struct Wrapped: Equatable, Encodable {
-            @🐮 var propC: TestStruct = .init()
+            @🐮 var propC: TestStruct
         }
 
         let wrapped = Wrapped(propC: .init(propA: "propA", propB: 100))
@@ -89,4 +93,13 @@ class 🐮Tests: XCTestCase {
 
         XCTAssertTrue(encodedString == "{\"propC\":{\"propA\":\"propA\",\"propB\":100}}")
     }
+}
+
+struct TestStruct: Equatable, Codable {
+    var propA: String
+    var propB: Int
+}
+
+func address(of value: some Any) -> String {
+    withUnsafePointer(to: value) { "\($0)" }
 }
