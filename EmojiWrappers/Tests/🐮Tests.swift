@@ -70,10 +70,7 @@ class 🐮Tests: XCTestCase {
             @🐮 var propC: TestStruct = .init()
         }
 
-        let json = """
-        { "propC": { "propA" : "propA", "propB" : 100 } }
-        """
-
+        let json = "{\"propC\":{\"propA\":\"propA\",\"propB\":100}}"
         let wrapped = try! JSONDecoder().decode(Wrapped.self, from: json.data(using: .utf8)!)
 
         XCTAssertTrue(wrapped.propC == .init(propA: "propA", propB: 100))
