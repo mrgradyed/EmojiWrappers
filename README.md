@@ -1,13 +1,11 @@
-# GoodWrappers
-A collections of handy Swift wrappers
+# EmojiWrappers
 
-- 🐮: a property wrapper that provides the COW 🐮 (Copy-On-Write) optimization for any Value type (https://github.com/apple/swift/blob/main/docs/OptimizationTips.rst#advice-use-copy-on-write-semantics-for-large-values)
+A funny collection of handy Swift wrappers
 
-- **IgnoreEquatable**: a property wrapper that allows to ignore a property when performing an equality check.
-  
+## 🐮
 
+A property wrapper that provides the COW 🐮 (Copy-On-Write) optimization for any Value type (https://github.com/apple/swift/blob/main/docs/OptimizationTips.rst#advice-use-copy-on-write-semantics-for-large-values).
 
-## 🐮 ("the COW") property wrapper
 
 ```
     struct MyStruct: Equatable {
@@ -20,7 +18,9 @@ A collections of handy Swift wrappers
     }
 ```
 
-## _IgnoreEquatable_ property wrapper
+## 🟰
+
+A property wrapper that allows to ignore a property when performing an equality check by assuming it's always equal.
 
 ```
     public struct MyStruct: Equatable {
