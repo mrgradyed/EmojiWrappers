@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "GoodWrappers"
-               BuildableName = "GoodWrappers"
-               BlueprintName = "GoodWrappers"
+               BlueprintIdentifier = "EmojiWrappers"
+               BuildableName = "EmojiWrappers"
+               BlueprintName = "EmojiWrappers"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,18 +29,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "GoodWrappersTests"
-               BuildableName = "GoodWrappersTests"
-               BlueprintName = "GoodWrappersTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -62,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "GoodWrappers"
-            BuildableName = "GoodWrappers"
-            BlueprintName = "GoodWrappers"
+            BlueprintIdentifier = "EmojiWrappers"
+            BuildableName = "EmojiWrappers"
+            BlueprintName = "EmojiWrappers"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>
