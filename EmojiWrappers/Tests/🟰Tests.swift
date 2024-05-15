@@ -1,6 +1,6 @@
 
-import Foundation
 import EmojiWrappers
+import Foundation
 import XCTest
 
 class 🟰Tests: XCTestCase {

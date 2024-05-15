@@ -1,6 +1,6 @@
 
-import Foundation
 import EmojiWrappers
+import Foundation
 import XCTest
 
 class 🐮Tests: XCTestCase {
@@ -28,10 +28,40 @@ class 🐮Tests: XCTestCase {
                 @🐮 var propC: TestStruct = .init()
             }
 
-            var a = Wrapped()
+            let a = Wrapped()
+            let b = a
+
+            XCTAssertTrue(withUnsafePointer(to: a.propC) { $0 } == withUnsafePointer(to: b.propC) { $0 })
+        }
+    }
+
+    func testWrappedWrite() {
+        DispatchQueue.main.async {
+            struct Wrapped: Equatable {
+                @🐮 var propC: TestStruct = .init()
+            }
+
+            let a = Wrapped()
             var b = a
 
-            XCTAssertTrue(withUnsafePointer(to: &a.propC) { $0 } == withUnsafePointer(to: &b.propC) { $0 })
+            b.propC = .init()
+
+            XCTAssertFalse(withUnsafePointer(to: a.propC) { $0 } == withUnsafePointer(to: b.propC) { $0 })
+        }
+    }
+
+    func testWrappedEquality() {
+        DispatchQueue.main.async {
+            struct Wrapped: Equatable {
+                @🐮 var propC: TestStruct = .init()
+            }
+
+            let a = Wrapped()
+            var b = a
+
+            XCTAssertTrue(a == b)
+            b.propC = .init()
+            XCTAssertFalse(a != b)
         }
     }
 }
