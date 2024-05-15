@@ -3,13 +3,13 @@ import Foundation
 import GoodWrappers
 import XCTest
 
-class IgnoreEquatableTests: XCTestCase {
+class 🟰Tests: XCTestCase {
     public struct Test: Equatable {
-        @IgnoreEquatable var propertyA: Int
+        @🟰 var propertyA: Int
         var propertyB: Int
     }
 
-    func testIgnoreEquatable() {
+    func testEquatable() {
         // this equality check must pass, although property A is different
         XCTAssertTrue(Test(propertyA: 1, propertyB: 3) == Test(propertyA: 2, propertyB: 3))
 
