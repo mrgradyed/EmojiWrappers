@@ -4,102 +4,66 @@ import Foundation
 import XCTest
 
 class 🐮Tests: XCTestCase {
-    func testNotWrappedRead() {
-        struct NotWrapped: Equatable {
-            var propC: TestStruct
-        }
-
-        let a = NotWrapped(propC: TestStruct(propA: "k", propB: 97))
-        let b = a
-
-        DispatchQueue.main.async {
-            XCTAssertTrue(address(of: a.propC) != address(of: b.propC))
-        }
-    }
-
     func testWrappedRead() {
-        struct Wrapped: Equatable {
-            @🐮 var propC: TestStruct
-        }
+        let a = CowStruct(cowValue: CustomStruct(property: ["aoh": 1]))
+        let b = a // must assign without copying CustomStruct property
 
-        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
-        let b = a
-
-        DispatchQueue.main.async {
-            XCTAssertTrue(address(of: a.propC) == address(of: b.propC))
-        }
+        XCTAssertTrue(a.cowValue == b.cowValue)
+        XCTAssertTrue(b.cowValueWrapper.isPointingToSameRefOf(a.cowValueWrapper)) // a and b should point to the same reference wrapper class
     }
 
-    func testWrappedWriteSingleRef() {
-        struct Wrapped: Equatable {
-            @🐮 var propC: TestStruct
-        }
+    func testWrappedWriteSingleReference() {
+        var a = CowStruct(cowValue: CustomStruct(property: ["aoh": 1]))
+        a.cowValue = CustomStruct(property: ["aoh": 2])
 
-        var a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
-        a.propC = TestStruct(propA: "changed", propB: 57)
-
-        XCTAssertTrue(a.propC == TestStruct(propA: "changed", propB: 57))
+        XCTAssertTrue(a.cowValue == CustomStruct(property: ["aoh": 2]))
     }
 
-    func testWrappedWriteMultiRef() {
-        struct Wrapped: Equatable {
-            @🐮 var propC: TestStruct
-        }
+    func testWrappedWriteMultipleReferences() {
+        let a = CowStruct(cowValue: CustomStruct(property: ["aoh": 1]))
+        var b = a // must assign without copying CustomStruct property
+        b.cowValue = CustomStruct(property: ["aoh": 2])
 
-        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
-        var b = a
-        b.propC = TestStruct(propA: "changed", propB: 57)
-
-        DispatchQueue.main.async {
-            XCTAssertTrue(address(of: a.propC) != address(of: b.propC))
-        }
+        XCTAssertTrue(a != b)
+        XCTAssertTrue(b.cowValue == CustomStruct(property: ["aoh": 2]))
+        XCTAssertFalse(b.cowValueWrapper.isPointingToSameRefOf(a.cowValueWrapper)) // a and b should NOT point to the same reference wrapper class
     }
 
     func testWrappedEquality() {
-        struct Wrapped: Equatable {
-            @🐮 var propC: TestStruct
-        }
-
-        let a = Wrapped(propC: TestStruct(propA: "k", propB: 97))
+        let a = CowStruct(cowValue: CustomStruct(property: ["aoh": 1]))
         var b = a
-
         XCTAssertTrue(a == b)
-        b.propC = TestStruct(propA: "k", propB: 97)
 
-        XCTAssertTrue(a == b)
+        b.cowValue = CustomStruct(property: ["aoh": 2])
+        XCTAssertTrue(a != b)
     }
 
     func testWrappedDecodable() {
-        struct Wrapped: Equatable, Decodable {
-            @🐮 var propC: TestStruct
-        }
+        let json = "{\"cowValue\":{\"property\":{\"aoh\":1}}}"
+        let cowStruct = try! JSONDecoder().decode(CowStruct.self, from: json.data(using: .utf8)!)
 
-        let json = "{\"propC\":{\"propA\":\"propA\",\"propB\":100}}"
-        let wrapped = try! JSONDecoder().decode(Wrapped.self, from: json.data(using: .utf8)!)
-
-        XCTAssertTrue(wrapped.propC == .init(propA: "propA", propB: 100))
+        XCTAssertTrue(cowStruct.cowValue == CustomStruct(property: ["aoh": 1]))
     }
 
     func testWrappedEncodable() {
-        struct Wrapped: Equatable, Encodable {
-            @🐮 var propC: TestStruct
-        }
-
-        let wrapped = Wrapped(propC: .init(propA: "propA", propB: 100))
+        let cowStruct = CowStruct(cowValue: CustomStruct(property: ["aoh": 1]))
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
-        let encodedData = try! encoder.encode(wrapped)
+        let encodedData = try! encoder.encode(cowStruct)
         let encodedString = String(data: encodedData, encoding: .utf8)
 
-        XCTAssertTrue(encodedString == "{\"propC\":{\"propA\":\"propA\",\"propB\":100}}")
+        XCTAssertTrue(encodedString == "{\"cowValue\":{\"property\":{\"aoh\":1}}}")
     }
-}
 
-struct TestStruct: Equatable, Codable {
-    var propA: String
-    var propB: Int
-}
+    struct CustomStruct: Equatable, Codable {
+        var property: [String: Int]
+    }
 
-func address(of value: some Any) -> String {
-    withUnsafePointer(to: value) { "\($0)" }
+    struct CowStruct: Equatable, Codable {
+        @🐮 var cowValue: CustomStruct
+
+        var cowValueWrapper: 🐮<CustomStruct> {
+            _cowValue
+        }
+    }
 }

@@ -56,3 +56,11 @@ extension 🐮: Encodable where V: Encodable { // Encodable conformance for "COW
         try container.encode(wrappedValue)
     }
 }
+
+#if DEBUG
+    public extension 🐮 {
+        func isPointingToSameRefOf(_ other: 🐮<V>) -> Bool {
+            wrapper === other.wrapper
+        }
+    }
+#endif
