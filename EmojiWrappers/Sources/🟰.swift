@@ -15,3 +15,17 @@ public struct 🟰<V>: Equatable {
         true // always equal
     }
 }
+
+extension 🟰: Decodable where V: Decodable { // Decodable conformance
+    public init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer().decode(V.self)
+        self = 🟰(wrappedValue: value)
+    }
+}
+
+extension 🟰: Encodable where V: Encodable { // Encodable conformance
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue)
+    }
+}
