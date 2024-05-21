@@ -2,16 +2,16 @@
 import Foundation
 
 /// A property wrapper that provides the COW 🐮 (Copy-On-Write) optimization for any Value type.
-
+/// https://github.com/apple/swift/blob/main/docs/OptimizationTips.rst#advice-use-copy-on-write-semantics-for-large-values
 @propertyWrapper
-public struct 🐮<Value> {
-    private var wrapper: Reference<Value>
+public struct 🐮<V> {
+    private var wrapper: Reference<V>
 
-    public init(wrappedValue: Value) {
+    public init(wrappedValue: V) {
         wrapper = Reference(wrappedValue)
     }
 
-    public var wrappedValue: Value {
+    public var wrappedValue: V {
         get { // upon "reading", simply return the current value stored inside the wrapper class instance
             wrapper.value
         }
@@ -29,28 +29,28 @@ public struct 🐮<Value> {
     }
 }
 
-private final class Reference<Value> { // wrapping class
-    var value: Value
+private final class Reference<V> { // wrapping class
+    var value: V
 
-    init(_ val: Value) {
+    init(_ val: V) {
         value = val
     }
 }
 
-extension 🐮: Equatable where Value: Equatable { // Equatable conformance for "COW wrapped" values
-    public static func == (lhs: 🐮<Value>, rhs: 🐮<Value>) -> Bool {
+extension 🐮: Equatable where V: Equatable { // Equatable conformance for "COW wrapped" values
+    public static func == (lhs: 🐮<V>, rhs: 🐮<V>) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
 
-extension 🐮: Decodable where Value: Decodable { // Decodable conformance for "COW wrapped" values
+extension 🐮: Decodable where V: Decodable { // Decodable conformance for "COW wrapped" values
     public init(from decoder: Decoder) throws {
-        let value = try decoder.singleValueContainer().decode(Value.self)
+        let value = try decoder.singleValueContainer().decode(V.self)
         self = 🐮(wrappedValue: value)
     }
 }
 
-extension 🐮: Encodable where Value: Encodable { // Encodable conformance for "COW wrapped" values
+extension 🐮: Encodable where V: Encodable { // Encodable conformance for "COW wrapped" values
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)
